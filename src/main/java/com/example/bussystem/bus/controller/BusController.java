@@ -1,11 +1,13 @@
 package com.example.bussystem.bus.controller;
 
 import com.example.bussystem.bus.domain.Bus;
+import com.example.bussystem.bus.dto.BusDetailDto;
 import com.example.bussystem.bus.dto.BusListDto;
 import com.example.bussystem.bus.dto.BusSaveDto;
 import com.example.bussystem.bus.service.BusService;
 import com.example.bussystem.common.dto.CommonErrorDto;
 import com.example.bussystem.common.dto.CommonResDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,13 +23,15 @@ public class BusController {
 
     private final BusService busService;
 
+    @Autowired
     public BusController(BusService busService) {
         this.busService = busService;
     }
 
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("create")
-    public ResponseEntity<?> busCreatePost(@ModelAttribute BusSaveDto dto,  @RequestParam MultipartFile busImage){
+    public ResponseEntity<?> busCreatePost(@ModelAttribute BusSaveDto dto, @RequestParam MultipartFile busImage) {
         try {
             Bus bus = busService.busCreate(dto);
             CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "버스등록에 성공하였습니다.", bus.getId());
@@ -40,16 +44,23 @@ public class BusController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> busList(Pageable pageable){
+    public ResponseEntity<?> busList(Pageable pageable) {
         Page<BusListDto> busListDtos = busService.busList(pageable);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "버스 목록을 조회합니다.", busListDtos);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<?> busDetail(@PathVariable Long id) {
+        BusDetailDto busDetail = busService.busDetail(id);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, busDetail.getBusNo() + " 버스의 상세페이지입니다.", busDetail);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/aws/create")
-    public ResponseEntity<?> busAwsCreatePost(@ModelAttribute BusSaveDto dto, @RequestParam MultipartFile busImage){
+    public ResponseEntity<?> busAwsCreatePost(@ModelAttribute BusSaveDto dto, @RequestParam MultipartFile busImage) {
         try {
             Bus bus = busService.busAwsCreate(dto);
             CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "버스 등록에 성공하였습니다.", bus.getId());

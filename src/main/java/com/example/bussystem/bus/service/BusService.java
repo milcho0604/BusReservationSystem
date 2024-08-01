@@ -1,6 +1,7 @@
 package com.example.bussystem.bus.service;
 
 import com.example.bussystem.bus.domain.Bus;
+import com.example.bussystem.bus.dto.BusDetailDto;
 import com.example.bussystem.bus.dto.BusListDto;
 import com.example.bussystem.bus.dto.BusSaveDto;
 import com.example.bussystem.bus.repository.BusRepository;
@@ -57,9 +58,6 @@ public class BusService {
             Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             bus.updateImagePath(path.toString());
 
-//            if (dto.getCategoryName().contains("직행")){
-//                stockInventoryService.increaseStock(Bus.getId(), dto.getStock_quantity());
-//            }
             // 위는 dirtyChecking 과정을 거쳐 변경을 감지한다. -> 다시 save 할 필요가 없음. !!
         } catch (IOException e) {
             throw new RuntimeException("이미지 저장에 실패했습니다.");
@@ -73,6 +71,14 @@ public class BusService {
         Page<Bus> buses = busRepository.findAll(pageable);
         return buses.map(a -> a.listFromEntity());
     }
+
+    @Transactional
+    public BusDetailDto busDetail(Long id){
+        Bus bus = busRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 버스입니다."));
+        return bus.detailFromEntity();
+    }
+
 
     @Transactional
     public Bus busAwsCreate(BusSaveDto dto) {

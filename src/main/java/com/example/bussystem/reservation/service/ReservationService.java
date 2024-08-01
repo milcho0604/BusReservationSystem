@@ -14,6 +14,7 @@ import com.example.bussystem.reservation.repository.ReservationRepository;
 import com.example.bussystem.user.domain.User;
 import com.example.bussystem.user.dto.UserListDto;
 import com.example.bussystem.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class ReservationService {
     private final StockInventoryService stockInventoryService;
     private final StockDecreaseEventHandler stockDecreaseEventHandler;
 
+    @Autowired
     public ReservationService(ReservationRepository reservationRepository, UserRepository userRepository, BusRepository busRepository, StockInventoryService stockInventoryService, StockDecreaseEventHandler stockDecreaseEventHandler) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
@@ -63,7 +65,7 @@ public class ReservationService {
                     throw new IllegalArgumentException("재고가 부족합니다");
                 } else {
                     // 변경감지로 인해 별도의 save 불필요
-                    bus.UpdatTicketQuantity(quantity);
+                    bus.updateTicketQuantity(quantity);
                 }
             }
             ReservationDetail reservationDetails = ReservationDetail.builder()

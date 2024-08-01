@@ -28,5 +28,7 @@ public class BusListDto {
 
     private Category category;
 
+    private Long price;
+
     private Integer ticket_quantity;
 }
